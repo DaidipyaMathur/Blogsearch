@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Blog Search</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="container">
+        <h1 class="fade-in">Personal Blog Search</h1>
+        
+        <div class="search-container fade-in-delay">
+            <input type="text" id="searchInput" placeholder="Search for deep-dive articles...">
+            <button id="searchButton">
+                <span class="button-text">Search</span>
+                <div class="loading-spinner"></div>
+            </button>
+        </div>
+
+        <!-- Grouped dark panel with glistening border -->
+        <div class="panel-group">
+            <div class="dark-panel">
+                <div class="panel-border"></div>
+                <div id="results"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const resultsDiv = document.getElementById('results');
+
+        // Function to perform the search
+        async function performSearch() {
+            const query = searchInput.value;
+            if (!query) return;
+
+            // Add loading state to button
+            searchButton.classList.add('loading');
+            
+            // Clear previous results with fade out
+            resultsDiv.style.opacity = '0';
+            
+            setTimeout(() => {
+                resultsDiv.innerHTML = '<div class="loading pulse">Searching...</div>';
+                resultsDiv.style.opacity = '1';
+            }, 150);
+
+            try {
+                // This is where we call our own backend API
+                const response = await fetch(`http://localhost:8000/search?q=${encodeURIComponent(query)}`);
+                const data = await response.json();
+                
+                displayResults(data.hits);
+            } catch (error) {
+                resultsDiv.innerHTML = '<div class="loading error-message">Error: Could not connect to the search server.</div>';
+                console.error("Search error:", error);
+            } finally {
+                // Remove loading state from button
+                searchButton.classList.remove('loading');
+            }
+        }
+
+        // Function to display the results on the page
+        function displayResults(hits) {
+            resultsDiv.style.opacity = '0';
+            
+            setTimeout(() => {
+                resultsDiv.innerHTML = ''; // Clear previous results
+
+                if (hits.length === 0) {
+                    resultsDiv.innerHTML = '<div class="loading">No results found.</div>';
+                    resultsDiv.style.opacity = '1';
+                    return;
+                }
+
+                hits.forEach((hit, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'result-item';
+                    item.style.animationDelay = `${index * 0.1}s`;
+
+                    // We are only displaying title and URL for now
+                    item.innerHTML = `
+                        <h3><a href="${hit.url}" target="_blank">${hit.title}</a></h3>
+                        <p class="result-url">${hit.url}</p>
+                    `;
+                    resultsDiv.appendChild(item);
+                });
+                
+                resultsDiv.style.opacity = '1';
+            }, 150);
+        }
+
+        // Event Listeners
+        searchButton.addEventListener('click', performSearch);
+        searchInput.addEventListener('keypress', (event) => {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        });
+    </script>
+
+</body>
+</html>

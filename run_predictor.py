@@ -4,15 +4,12 @@ import torch
 
 # --- Configuration ---
 # The input file with all your data (labeled and unlabeled)
-INPUT_FILE = "ground_truth_for_labeling.jsonl" 
+INPUT_FILE = "ground_truth_combined.jsonl" 
 
 # The new output file where results with model predictions will be saved
 OUTPUT_FILE = "new_classified.jsonl" 
 
-# The path to your fine-tuned model. 
-# IMPORTANT: Look inside this folder and find the checkpoint with the highest number
-# (e.g., 'checkpoint-15', 'checkpoint-210', etc.).
-MODEL_PATH = "./blog_classifier_model/checkpoint-345" # <-- CORRECTED: Using the highest checkpoint number from your last training run.
+MODEL_PATH = "./blog_classifier_model/checkpoint-345" 
 
 # --- Main Script ---
 def run_batch_prediction():
@@ -56,7 +53,6 @@ def run_batch_prediction():
     with open(OUTPUT_FILE, 'w') as f_out:
         for i, record in enumerate(all_records):
             
-            # This is the core logic: get the text from the record
             text_to_classify = record.get("text", "")
 
             # Ensure there is text to classify

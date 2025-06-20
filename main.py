@@ -16,7 +16,6 @@ client = meilisearch.Client(MEILISEARCH_URL, MEILISEARCH_API_KEY)
 
 # --- CORS Middleware ---
 # This allows our HTML file (on a different "origin") to talk to our backend API.
-# It's a standard security feature in web browsers.
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # Allow all origins (for local development)
